@@ -3,7 +3,7 @@ from cryptography.fernet import Fernet
 
 
 class AES:
-    cipher_suite = Fernet(b'f2I1oGzpgpmqL2iErldUWX97VhZ3gMeSmsgsMlH0c2o=')
+    cipher_suite = Fernet(os.environ.get('AES_KEY').encode('utf-8'))
 
     @classmethod
     def encrypt_password(cls, password: str) -> bytes:
