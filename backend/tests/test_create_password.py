@@ -5,6 +5,20 @@ import pytest
     "service_name, password_data, expected_status_code, expected_detail",
     [
         (
+                "google.com",
+                {},
+                422,
+                {'detail': [
+                    {'input': {},
+                       'loc': ['body', 'password'],
+                       'msg': 'Field required',
+                       'type': 'missing',
+                       'url': 'https://errors.pydantic.dev/2.4/v/missing'
+                    }
+                ]
+                }
+        ),
+        (
             "yandex.ru",
             {"password": "12345", },
             200,

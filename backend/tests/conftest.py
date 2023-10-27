@@ -36,7 +36,7 @@ async def async_session_test():
     async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False, autocommit=False, autoflush=False)
     yield async_session
 
-@pytest.fixture(scope="function", autouse=True)
+@pytest.fixture(scope="session", autouse=True)
 async def clean_tables(async_session_test):
     """Clean data in all tables before running test function"""
     async with async_session_test() as session:
