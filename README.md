@@ -15,7 +15,7 @@ cd ManagerPassword
 ```
 3. Собрать образы и запустить контейнеры 
 ```bash
-docker compose -f docker-compose.yaml up -d 
+docker compose -f docker-compose-dev.yaml up -d 
 ```
 4. Совершить миграции внутри контейнера backend с помощью alembic
 ```bash
@@ -25,7 +25,7 @@ docker-compose run --rm backend sh -c 'alembic upgrade heads'
 ## Как остановить проект
 Чтобы остановить все контейнеры
 ```bash
-docker compose -f docker-compose.yaml down --remove-orphans
+docker compose -f docker-compose-dev.yaml down --remove-orphans
 ```
 
 ## Documentation

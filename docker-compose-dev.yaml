@@ -1,6 +1,7 @@
 services:
 
   backend:
+    container_name: backend
     build:
       dockerfile: Dockerfile_backend
     volumes:
@@ -22,7 +23,7 @@ services:
     image: postgres:15-alpine3.18
     container_name: database
     volumes:
-      - data_bd:/var/lib/postgresql/data
+      - data_db:/var/lib/postgresql/data
     env_file:
       - .env
     ports:
@@ -31,9 +32,10 @@ services:
       - web_app_network
     restart: always
 
+
 networks:
   web_app_network:
     driver: bridge
 
 volumes:
-  data_bd:
+  data_db:

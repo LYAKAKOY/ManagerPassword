@@ -1,0 +1,43 @@
+services:
+
+  backend:
+    container_name: backend
+    build:
+      dockerfile: Dockerfile_backend
+    volumes:
+      - ./backend:/backend
+    environment:
+      DATABASE: test_database
+      POSTGRES_DB: test_managerpassword
+      POSTGRES_USER: test_admin
+      POSTGRES_PASSWORD: test_LSDd-qweas@1e3eadl
+    networks:
+      - web_app_network
+    ports:
+      - '127.0.0.1:8000:8000'
+    command: >
+      sh -c "uvicorn main:app --reload --host 0.0.0.0 --port 8000"
+    depends_on:
+      - test_database
+
+  test_database:
+    image: postgres:15-alpine3.18
+    container_name: test_database
+    volumes:
+      - data_test_db:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: test_managerpassword
+      POSTGRES_USER: test_admin
+      POSTGRES_PASSWORD: test_LSDd-qweas@1e3eadl
+    ports:
+      - '127.0.0.1:5432:5432'
+    networks:
+      - web_app_network
+    restart: always
+
+networks:
+  web_app_network:
+    driver: bridge
+
+volumes:
+  data_test_db:
