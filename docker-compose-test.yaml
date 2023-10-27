@@ -9,8 +9,9 @@ services:
     environment:
       DATABASE: test_database
       POSTGRES_DB: test_managerpassword
-      POSTGRES_USER: test_admin
-      POSTGRES_PASSWORD: test_LSDd-qweas@1e3eadl
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: 12345
+      AES_KEY: f2I2oGzpgpmqL2iGhlgUAS98VhZ3gMeSmsgsMlH0c2o=
     networks:
       - web_app_network
     ports:
@@ -27,10 +28,10 @@ services:
       - data_test_db:/var/lib/postgresql/data
     environment:
       POSTGRES_DB: test_managerpassword
-      POSTGRES_USER: test_admin
-      POSTGRES_PASSWORD: test_LSDd-qweas@1e3eadl
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: 12345
     ports:
-      - '127.0.0.1:5432:5432'
+      - '127.0.0.1:5433:5432'
     networks:
       - web_app_network
     restart: always
