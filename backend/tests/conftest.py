@@ -36,7 +36,7 @@ async def async_session_test():
     async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False, autocommit=False, autoflush=False)
     yield async_session
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(scope="function", autouse=True)
 async def clean_tables(async_session_test):
     """Clean data in all tables before running test function"""
     async with async_session_test() as session:
@@ -59,3 +59,14 @@ async def asyncpg_pool():
     pool = await asyncpg.create_pool("".join(settings.DATABASE_URL.split("+asyncpg")))
     yield pool
     pool.close()
+
+
+@pytest.fixture
+async def get_password_from_database(asyncpg_pool):
+    async def get_password_from_database_by_service_name(service_name: str):
+        async with asyncpg_pool.acquire() as connection:
+            return await connection.fetch(
+                """SELECT * FROM passwords WHERE service_name = $1;""", service_name
+            )
+
+    return get_password_from_database_by_service_name
