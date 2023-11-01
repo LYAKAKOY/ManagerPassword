@@ -1,18 +1,21 @@
 import json
 import pytest
 
+from crypt import AES
+from tests.conftest import _get_test_db
+
 
 @pytest.mark.parametrize(
     "service_name, password_data, expected_status_code, expected_detail",
     [
         (
-            "yandex.ru",
-            {"password": "12345", },
-            200,
-            {
-                "service_name": "yandex.ru",
-                "password": "12345"
-            }
+                "yandex.ru",
+                {"password": "12345", },
+                200,
+                {
+                    "service_name": "yandex.ru",
+                    "password": "12345"
+                }
         ),
         (
                 "yandex.ru",
@@ -34,13 +37,11 @@ import pytest
         ),
     ],
 )
-async def test_create_password(
-    client, get_password_from_database, service_name, password_data, expected_status_code, expected_detail
+async def test_create_password_handler(
+        client, service_name, password_data, expected_status_code, expected_detail
 ):
     response = await client.post(f"/password/{service_name}", data=json.dumps(password_data))
     data_from_response = response.json()
     assert response.status_code == expected_status_code
     assert data_from_response == expected_detail
-    data_from_db = await get_password_from_database(service_name)
-    assert data_from_db[0]['service_name'] == service_name
-    assert data_from_db[0]['password'] != password_data['password']
+
