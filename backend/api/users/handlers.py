@@ -5,54 +5,41 @@ from fastapi import Depends
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
-from api.users.schemas import ShowUser, CreateUser
+from api.users.schemas import ShowUser, CreateUser, UpdateUser
 from db.session import get_db
-
+from api.actions.user import _create_user, _update_user_password, _get_user_by_login
 
 user_router = APIRouter()
 
+logger = getLogger(__name__)
 
-@user_router.post("/", response_model=ShowUser)
+
+@user_router.post("/auth", response_model=ShowUser)
 async def create_or_update_password(user: CreateUser,
                                     db: AsyncSession = Depends(get_db)) -> ShowUser:
     """Создать пользователя для менеджера паролей"""
     try:
-        password = await _create_or_update_password(service_name, password, db)
-        if password is None:
+        user = await _create_user(user, db)
+        if user is None:
             raise HTTPException(
-                status_code=500, detail=f"An error occurred try again"
+                status_code=400, detail=f"the login is already occupied"
             )
-        return password
+        return user
     except IntegrityError as err:
         logger.error(err)
         raise HTTPException(status_code=503, detail=f"Database error: {err}")
 
 
-@user_router.put("/{service_name}", response_model=ShowPassword)
-async def get_password(service_name: str, db: AsyncSession = Depends(get_db)) -> ShowPassword:
+@user_router.put("/change_password", response_model=UpdateUser)
+async def get_password(user_update: UpdateUser, db: AsyncSession = Depends(get_db)) -> ShowUser:
     """Получить пароль по заданному сервису"""
     try:
-        password = await _get_password_by_service_name(service_name, db)
-        if password is None:
+        user = await _update_user_password(user_update, db)
+        if user is None:
             raise HTTPException(
-                status_code=404, detail=f"The password of this service not found"
+                status_code=400, detail=f"The password is too easy"
             )
-        return password
-    except IntegrityError as err:
-        logger.error(err)
-        raise HTTPException(status_code=503, detail=f"Database error: {err}")
-
-
-@user_router.get("/", response_model=List[ShowPassword])
-async def get_passwords_by_match(service_name: str, db: AsyncSession = Depends(get_db)) -> List[ShowPassword]:
-    """Получить пароль(и) по части имени сервиса"""
-    try:
-        passwords = await _get_passwords_by_match_service_name(service_name, db)
-        if not passwords:
-            raise HTTPException(
-                status_code=404, detail=f"No service found"
-            )
-        return passwords
+        return user
     except IntegrityError as err:
         logger.error(err)
         raise HTTPException(status_code=503, detail=f"Database error: {err}")
