@@ -17,7 +17,7 @@ async def _create_user(body: CreateUser, session) -> ShowUser | None:
 async def _update_user_password(body: UpdateUser, session) -> ShowUser | None:
     async with session.begin():
         user_dal = UserDAL(session)
-        user = await user_dal.set_password(login=body.login, password=body.password)
+        user = await user_dal.set_password(login=body.login, password=Hasher.get_password_hash(body.password))
         if user is not None:
             return ShowUser(
                 user_id=user.user_id

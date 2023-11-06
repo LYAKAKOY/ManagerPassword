@@ -1,5 +1,4 @@
 from logging import getLogger
-from typing import List
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
@@ -15,7 +14,7 @@ logger = getLogger(__name__)
 
 
 @user_router.post("/auth", response_model=ShowUser)
-async def create_or_update_password(user: CreateUser,
+async def create_user(user: CreateUser,
                                     db: AsyncSession = Depends(get_db)) -> ShowUser:
     """Создать пользователя для менеджера паролей"""
     try:
@@ -30,8 +29,8 @@ async def create_or_update_password(user: CreateUser,
         raise HTTPException(status_code=503, detail=f"Database error: {err}")
 
 
-@user_router.put("/change_password", response_model=UpdateUser)
-async def get_password(user_update: UpdateUser, db: AsyncSession = Depends(get_db)) -> ShowUser:
+@user_router.put("/change_password", response_model=ShowUser)
+async def change_password(user_update: UpdateUser, db: AsyncSession = Depends(get_db)) -> ShowUser:
     """Получить пароль по заданному сервису"""
     try:
         user = await _update_user_password(user_update, db)

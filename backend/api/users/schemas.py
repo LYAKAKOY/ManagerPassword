@@ -18,4 +18,4 @@ class UpdateUser(BaseModel):
 
 
 class ShowUser(TunedModel):
-    user_id: uuid.uuid4
+    user_id: uuid.UUID
