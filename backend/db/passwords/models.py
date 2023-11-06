@@ -1,4 +1,4 @@
-from sqlalchemy import Column, VARBINARY, Integer, String
+from sqlalchemy import Column, Integer, String
 from sqlalchemy.types import TypeDecorator
 from sqlalchemy.orm import declarative_base
 

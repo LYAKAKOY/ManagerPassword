@@ -1,9 +1,9 @@
 from typing import List
 from crypt import AES
 from sqlalchemy.ext.asyncio import AsyncSession
-from api.schemas import ShowPassword
-from api.schemas import CreatePassword
-from db.dals import PasswordDAL
+from api.passwords.schemas import ShowPassword
+from api.passwords.schemas import CreatePassword
+from db.passwords.dals import PasswordDAL
 
 
 async def _create_or_update_password(service_name: str, body: CreatePassword, session) -> ShowPassword | None:

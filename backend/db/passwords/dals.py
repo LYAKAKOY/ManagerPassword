@@ -1,9 +1,8 @@
 from typing import List
-
 from sqlalchemy import select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
-from db.models import Password
+from db.passwords.models import Password
 
 
 class PasswordDAL:

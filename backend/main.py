@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.routing import APIRouter
 
-from api.handlers import manager_password_router
+from api.passwords.handlers import manager_password_router
 
 app = FastAPI(title="ManagerPassword")
 

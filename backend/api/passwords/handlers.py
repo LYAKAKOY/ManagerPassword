@@ -7,8 +7,8 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from api.actions.password import _create_or_update_password, _get_password_by_service_name, \
     _get_passwords_by_match_service_name
-from api.schemas import ShowPassword
-from api.schemas import CreatePassword
+from api.passwords.schemas import ShowPassword
+from api.passwords.schemas import CreatePassword
 from db.session import get_db
 
 logger = getLogger(__name__)
