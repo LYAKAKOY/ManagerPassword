@@ -1,4 +1,3 @@
-from logging import getLogger
 from typing import List
 from fastapi import APIRouter
 from fastapi import Depends
@@ -11,7 +10,6 @@ from api.passwords.schemas import ShowPassword
 from api.passwords.schemas import CreatePassword
 from db.session import get_db
 
-logger = getLogger(__name__)
 
 manager_password_router = APIRouter()
 
