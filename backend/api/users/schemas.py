@@ -19,3 +19,8 @@ class UpdateUser(BaseModel):
 
 class ShowUser(TunedModel):
     user_id: uuid.UUID
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
