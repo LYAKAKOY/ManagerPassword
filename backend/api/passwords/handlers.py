@@ -5,11 +5,14 @@ from fastapi import Depends
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from api.actions.auth import get_current_user_from_token
 from api.actions.password import _create_or_update_password, _get_password_by_service_name, \
     _get_passwords_by_match_service_name
 from api.passwords.schemas import ShowPassword
 from api.passwords.schemas import CreatePassword
 from db.session import get_db
+from db.users.models import User
 
 manager_password_router = APIRouter()
 
@@ -18,6 +21,7 @@ logger = getLogger(__name__)
 
 @manager_password_router.post("/{service_name}", response_model=ShowPassword)
 async def create_or_update_password(service_name: str, password: CreatePassword,
+                                    current_user: User = Depends(get_current_user_from_token),
                                     db: AsyncSession = Depends(get_db)) -> ShowPassword:
     """Создать или обновить пароль для сервиса"""
     try:
