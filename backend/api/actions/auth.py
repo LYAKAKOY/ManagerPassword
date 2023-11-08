@@ -26,14 +26,14 @@ async def authenticate_user(
     user = await _get_user_by_login_for_auth(login=login, session=db)
     if user is None:
         return
-    if not Hasher.verify_password(password, user.hashed_password):
+    if not Hasher.verify_password(password, user.password):
         return
     return user
 
 
 async def get_current_user_from_token(
         token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)
-):
+) -> User | None:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",

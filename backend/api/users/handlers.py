@@ -1,3 +1,4 @@
+import json
 from datetime import timedelta
 from logging import getLogger
 from fastapi import APIRouter
@@ -31,7 +32,7 @@ async def login_for_access_token(
         )
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": user.user_id, "other_custom_data": []},
+        data={"sub": str(user.user_id), "other_custom_data": []},
         expires_delta=access_token_expires,
     )
     return {"access_token": access_token, "token_type": "bearer"}
