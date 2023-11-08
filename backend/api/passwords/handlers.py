@@ -25,7 +25,7 @@ async def create_or_update_password(service_name: str, password: CreatePassword,
                                     db: AsyncSession = Depends(get_db)) -> ShowPassword:
     """Создать или обновить пароль для сервиса"""
     try:
-        password = await _create_or_update_password(service_name, password, db)
+        password = await _create_or_update_password(service_name, password, current_user, db)
         if password is None:
             raise HTTPException(
                 status_code=500, detail=f"An error occurred try again"
@@ -37,10 +37,11 @@ async def create_or_update_password(service_name: str, password: CreatePassword,
 
 
 @manager_password_router.get("/{service_name}", response_model=ShowPassword)
-async def get_password(service_name: str, db: AsyncSession = Depends(get_db)) -> ShowPassword:
+async def get_password(service_name: str, current_user: User = Depends(get_current_user_from_token),
+                       db: AsyncSession = Depends(get_db)) -> ShowPassword:
     """Получить пароль по заданному сервису"""
     try:
-        password = await _get_password_by_service_name(service_name, db)
+        password = await _get_password_by_service_name(service_name, current_user, db)
         if password is None:
             raise HTTPException(
                 status_code=404, detail=f"The password of this service not found"
@@ -52,10 +53,11 @@ async def get_password(service_name: str, db: AsyncSession = Depends(get_db)) ->
 
 
 @manager_password_router.get("/", response_model=List[ShowPassword])
-async def get_passwords_by_match(service_name: str, db: AsyncSession = Depends(get_db)) -> List[ShowPassword]:
+async def get_passwords_by_match(service_name: str, current_user: User = Depends(get_current_user_from_token),
+                                 db: AsyncSession = Depends(get_db)) -> List[ShowPassword]:
     """Получить пароль(и) по части имени сервиса"""
     try:
-        passwords = await _get_passwords_by_match_service_name(service_name, db)
+        passwords = await _get_passwords_by_match_service_name(service_name, current_user, db)
         if not passwords:
             raise HTTPException(
                 status_code=404, detail=f"No service found"
