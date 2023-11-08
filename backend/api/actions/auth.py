@@ -1,3 +1,5 @@
+import uuid
+
 from fastapi import Depends
 from fastapi import HTTPException
 from fastapi.security import OAuth2PasswordBearer
@@ -14,16 +16,16 @@ from hashing import Hasher
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/user/login/token")
 
 
-async def _get_user_by_login_for_auth(login: str, session: AsyncSession):
+async def _get_user_by_user_id_for_auth(user_id: uuid.UUID, session: AsyncSession):
     async with session.begin():
         user_dal = UserDAL(session)
-        return await user_dal.get_user_by_login(login=login)
+        return await user_dal.get_user_by_user_id(user_id=user_id)
 
 
 async def authenticate_user(
-        login: str, password: str, db: AsyncSession
+        user_id: uuid.UUID, password: str, db: AsyncSession
 ) -> User | None:
-    user = await _get_user_by_login_for_auth(login=login, session=db)
+    user = await _get_user_by_user_id_for_auth(user_id=user_id, session=db)
     if user is None:
         return
     if not Hasher.verify_password(password, user.password):
@@ -42,12 +44,12 @@ async def get_current_user_from_token(
         payload = jwt.decode(
             token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
         )
-        login: str = payload.get("sub")
-        if login is None:
+        user_id: str = payload.get("sub")
+        if user_id is None:
             raise credentials_exception
     except JWTError:
         raise credentials_exception
-    user = await _get_user_by_login_for_auth(login=login, session=db)
+    user = await _get_user_by_user_id_for_auth(user_id=user_id, session=db)
     if user is None:
         raise credentials_exception
     return user

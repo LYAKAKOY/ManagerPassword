@@ -1,4 +1,4 @@
-from typing import List
+import uuid
 from sqlalchemy import select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -28,8 +28,8 @@ class UserDAL:
         if user is not None:
             return user[0]
 
-    async def get_user_by_login(self, login: str) -> User | None:
-        query = select(User).where(User.login == login)
+    async def get_user_by_user_id(self, user_id: uuid.UUID) -> User | None:
+        query = select(User).where(User.user_id == user_id)
         res = await self.db_session.execute(query)
         user = res.fetchone()
         if user is not None:
