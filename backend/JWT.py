@@ -1,13 +1,11 @@
 from datetime import datetime
 from datetime import timedelta
-from typing import Optional
-
 from jose import jwt
 
 import settings
 
 
-def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
+def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.utcnow() + expires_delta

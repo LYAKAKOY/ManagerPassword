@@ -11,7 +11,7 @@ from db.users.dals import UserDAL
 from db.users.models import User
 from hashing import Hasher
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login/token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/user/login/token")
 
 
 async def _get_user_by_login_for_auth(login: str, session: AsyncSession):

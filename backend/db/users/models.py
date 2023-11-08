@@ -1,8 +1,6 @@
 import uuid
 from sqlalchemy import Column, String, UUID
-from sqlalchemy.orm import declarative_base
-
-Base = declarative_base()
+from db.session import Base
 
 
 class User(Base):

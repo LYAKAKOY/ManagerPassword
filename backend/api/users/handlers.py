@@ -12,14 +12,14 @@ from JWT import create_access_token
 from api.actions.auth import authenticate_user
 from api.users.schemas import ShowUser, CreateUser, UpdateUser, Token
 from db.session import get_db
-from api.actions.user import _create_user, _update_user_password, _get_user_by_login
+from api.actions.user import _create_user, _update_user_password
 
 user_router = APIRouter()
 
 logger = getLogger(__name__)
 
 
-@user_router.post("/token", response_model=Token)
+@user_router.post("/login/token", response_model=Token)
 async def login_for_access_token(
         form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)
 ):

@@ -1,8 +1,6 @@
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.types import TypeDecorator
-from sqlalchemy.orm import declarative_base
-
-Base = declarative_base()
+from db.session import Base
 
 
 class HexByteString(TypeDecorator):
