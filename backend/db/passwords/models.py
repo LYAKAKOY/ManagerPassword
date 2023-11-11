@@ -1,7 +1,10 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
-from sqlalchemy.types import TypeDecorator
 from db.session import Base
 from db.users.models import User
+from sqlalchemy import Column
+from sqlalchemy import ForeignKey
+from sqlalchemy import Integer
+from sqlalchemy import String
+from sqlalchemy.types import TypeDecorator
 
 
 class HexByteString(TypeDecorator):
@@ -22,6 +25,6 @@ class Password(Base):
     __tablename__ = "passwords"
 
     pk = Column(Integer, autoincrement=True, primary_key=True)
-    user_id = Column(ForeignKey(User.user_id, ondelete='CASCADE'), nullable=False)
+    user_id = Column(ForeignKey(User.user_id, ondelete="CASCADE"), nullable=False)
     service_name = Column(String, unique=True, nullable=False)
     password = Column(HexByteString, nullable=False)

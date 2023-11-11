@@ -11,11 +11,11 @@ git clone https://github.com/LYAKAKOY/ManagerPassword.git
 ```
 2. Перейти в папку ManagerPassword
 ```bash
-cd ManagerPassword 
+cd ManagerPassword
 ```
-3. Собрать образы и запустить контейнеры 
+3. Собрать образы и запустить контейнеры
 ```bash
-docker compose -f docker-compose-dev.yaml up -d 
+docker compose -f docker-compose-dev.yaml up -d
 ```
 4. Совершить миграции внутри контейнера backend с помощью alembic
 ```bash
