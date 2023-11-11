@@ -1,19 +1,29 @@
-from typing import Generator, Any
-import pytest
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqlalchemy import text
-from sqlalchemy.orm import sessionmaker
-from httpx import AsyncClient
-from main import app
 import asyncio
-from db.session import get_db
+import uuid
+from typing import Any
+from typing import Generator
+
 import asyncpg
+import pytest
 import settings
+from db.session import get_db
+from httpx import AsyncClient
+from JWT import create_access_token
+from main import app
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import create_async_engine
+from sqlalchemy.orm import sessionmaker
 
 test_engine = create_async_engine(settings.DATABASE_URL, future=True, echo=True)
 
-test_async_session = sessionmaker(test_engine, class_=AsyncSession, expire_on_commit=False, autocommit=False,
-                                  autoflush=False)
+test_async_session = sessionmaker(
+    test_engine,
+    class_=AsyncSession,
+    expire_on_commit=False,
+    autocommit=False,
+    autoflush=False,
+)
 
 CLEAN_TABLES = ["passwords"]
 
@@ -37,7 +47,13 @@ async def _get_test_db():
 @pytest.fixture(scope="session")
 async def async_session_test():
     engine = create_async_engine(settings.DATABASE_URL, future=True, echo=True)
-    async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False, autocommit=False, autoflush=False)
+    async_session = sessionmaker(
+        engine,
+        class_=AsyncSession,
+        expire_on_commit=False,
+        autocommit=False,
+        autoflush=False,
+    )
     yield async_session
 
 
@@ -50,6 +66,14 @@ async def clean_tables(async_session_test):
                 await session.execute(text(f"TRUNCATE TABLE {table_for_cleaning}"))
 
 
+@pytest.fixture(scope="session", autouse=True)
+async def clean_table_users(async_session_test):
+    """Clean data in users table before running session"""
+    async with async_session_test() as session:
+        async with session.begin():
+            await session.execute(text("TRUNCATE TABLE users CASCADE"))
+
+
 @pytest.fixture(scope="function")
 async def client() -> Generator[AsyncClient, Any, None]:
     """
@@ -59,6 +83,27 @@ async def client() -> Generator[AsyncClient, Any, None]:
     app.dependency_overrides[get_db] = _get_test_db
     async with AsyncClient(app=app, base_url="http://127.0.0.1") as client:
         yield client
+
+
+@pytest.fixture(scope="session", autouse=True)
+async def create_user(asyncpg_pool):
+    user_id = uuid.uuid4()
+    async with asyncpg_pool.acquire() as connection:
+        await connection.execute(
+            """INSERT INTO users VALUES ($1, $2, $3)""",
+            user_id,
+            "Lewislogin",
+            "password",
+        )
+        return user_id
+
+
+@pytest.fixture
+async def create_test_auth_headers_for_user(create_user):
+    access_token = create_access_token(
+        data={"sub": str(create_user), "other_custom_data": []}
+    )
+    return {"Authorization": f"Bearer {access_token}"}
 
 
 @pytest.fixture(scope="session")
