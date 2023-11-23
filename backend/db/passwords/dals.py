@@ -2,10 +2,12 @@ import uuid
 from typing import List
 
 from db.passwords.models import Password
+from db.users.models import User
 from sqlalchemy import select
 from sqlalchemy import update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 
 class PasswordDAL:
@@ -52,10 +54,9 @@ class PasswordDAL:
         query = select(Password).where(
             Password.user_id == user_id, Password.service_name == service_name
         )
-        res = await self.db_session.execute(query)
-        password = res.fetchone()
+        password = await self.db_session.scalar(query)
         if password is not None:
-            return password[0]
+            return password
 
     async def get_password_by_match_service_name(
         self, user_id: uuid.UUID, service_name: str
@@ -65,7 +66,15 @@ class PasswordDAL:
             .where(Password.user_id == user_id)
             .filter(Password.service_name.contains(service_name))
         )
-        res = await self.db_session.execute(query)
-        passwords = res.fetchall()
+        passwords = await self.db_session.scalars(query)
         if passwords is not None:
             return passwords
+
+    async def get_all_passwords(self, user_id: uuid.UUID) -> List[Password] | None:
+        query = (
+            select(User)
+            .where(User.user_id == user_id)
+            .options(selectinload(User.passwords))
+        )
+        user = await self.db_session.scalar(query)
+        return user.passwords

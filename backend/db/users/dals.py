@@ -40,3 +40,9 @@ class UserDAL:
         user = res.fetchone()
         if user is not None:
             return user[0]
+
+    async def get_user_by_login(self, login: str) -> User | None:
+        query = select(User).where(User.login == login)
+        user = await self.db_session.scalar(query)
+        if user is not None:
+            return user

@@ -3,6 +3,7 @@ from typing import List
 
 from api.actions.auth import get_current_user_from_token
 from api.actions.password import _create_or_update_password
+from api.actions.password import _get_all_passwords
 from api.actions.password import _get_password_by_service_name
 from api.actions.password import _get_passwords_by_match_service_name
 from api.passwords.schemas import CreatePassword
@@ -18,6 +19,21 @@ from sqlalchemy.ext.asyncio import AsyncSession
 manager_password_router = APIRouter()
 
 logger = getLogger(__name__)
+
+
+@manager_password_router.get("/all", response_model=List[ShowPassword])
+async def get_all_passwords(
+    current_user: User = Depends(get_current_user_from_token),
+    db: AsyncSession = Depends(get_db),
+) -> List[ShowPassword]:
+    try:
+        passwords = await _get_all_passwords(current_user, db)
+        if passwords is None:
+            raise HTTPException(status_code=500, detail="An error occurred try again")
+        return passwords
+    except IntegrityError as err:
+        logger.error(err)
+        raise HTTPException(status_code=503, detail="Database error: {err}")
 
 
 @manager_password_router.post("/{service_name}", response_model=ShowPassword)

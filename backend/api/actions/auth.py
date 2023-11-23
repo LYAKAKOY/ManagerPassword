@@ -22,10 +22,14 @@ async def _get_user_by_user_id_for_auth(user_id: uuid.UUID, session: AsyncSessio
         return await user_dal.get_user_by_user_id(user_id=user_id)
 
 
-async def authenticate_user(
-    user_id: uuid.UUID, password: str, db: AsyncSession
-) -> User | None:
-    user = await _get_user_by_user_id_for_auth(user_id=user_id, session=db)
+async def _get_user_by_login_for_auth(login: str, session: AsyncSession):
+    async with session.begin():
+        user_dal = UserDAL(session)
+        return await user_dal.get_user_by_login(login=login)
+
+
+async def authenticate_user(login: str, password: str, db: AsyncSession) -> User | None:
+    user = await _get_user_by_login_for_auth(login=login, session=db)
     if user is None:
         return
     if not Hasher.verify_password(password, user.password):
