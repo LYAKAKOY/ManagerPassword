@@ -1,11 +1,15 @@
-from db.session import Base
-from db.users.models import User
-from sqlalchemy import Column
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from db.base import Base
+from sqlalchemy import UUID
 from sqlalchemy import ForeignKey
-from sqlalchemy import Integer
 from sqlalchemy import String
 from sqlalchemy.types import TypeDecorator
 
+if TYPE_CHECKING:
+    from db.users.models import User
 
 class HexByteString(TypeDecorator):
     """Convert Python bytestring to string with hexadecimal digits and back for storage."""
@@ -22,9 +26,10 @@ class HexByteString(TypeDecorator):
 
 
 class Password(Base):
-    __tablename__ = "passwords"
 
-    pk = Column(Integer, autoincrement=True, primary_key=True)
-    user_id = Column(ForeignKey(User.user_id, ondelete="CASCADE"), nullable=False)
-    service_name = Column(String, unique=True, nullable=False)
-    password = Column(HexByteString, nullable=False)
+    id: Mapped[int] = mapped_column(autoincrement=True, primary_key=True)
+    service_name: Mapped[str] = mapped_column(unique=True)
+    password: Mapped[str] = mapped_column(HexByteString)
+    user_id: Mapped[UUID] = mapped_column(ForeignKey('users.user_id', ondelete="CASCADE"))
+
+    user: Mapped[User] = relationship(back_populates="passwords")

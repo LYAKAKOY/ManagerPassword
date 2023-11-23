@@ -1,14 +1,16 @@
+from __future__ import annotations
+
 import uuid
-
-from db.session import Base
-from sqlalchemy import Column
+from typing import TYPE_CHECKING, List
 from sqlalchemy import String
-from sqlalchemy import UUID
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from db.base import Base
 
-
+if TYPE_CHECKING:
+    from db.passwords.models import Password
 class User(Base):
-    __tablename__ = "users"
+    user_id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4(), server_default=str(uuid.uuid4()))
+    login: Mapped[str] = mapped_column(String(20), unique=True, index=True)
+    password: Mapped[str] = mapped_column(String(50))
 
-    user_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4())
-    login = Column(String, nullable=False, unique=True, index=True)
-    password = Column(String, nullable=False)
+    passwords: Mapped[List[Password]] = relationship(back_populates="user")
